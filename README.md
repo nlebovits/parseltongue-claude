@@ -115,12 +115,11 @@ See `parseltongue_dsl_reference` tool for full documentation.
 ## Development
 
 ```bash
-uv pip install -e ".[dev]"                # install
-pre-commit install --hook-type commit-msg --hook-type pre-commit  # hooks
-pytest                                     # test (80% coverage required)
-ruff check --fix . && ruff format .        # lint + format
-ty check src/                              # type check
-cz commit                                  # conventional commit
+uv pip install -e ".[dev]"                              # install
+uv run pre-commit install --hook-type commit-msg --hook-type pre-commit
+uv run pytest                                           # test (80% coverage)
+uv run ruff check --fix . && uv run ruff format .       # lint + format
+uv run cz commit                                        # conventional commit
 ```
 
 ## License
