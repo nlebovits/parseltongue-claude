@@ -14,9 +14,10 @@ calling an LLM API, Claude Code (the LLM) calls Parseltongue for verification.
 from __future__ import annotations
 
 import json
+import logging
 
 from mcp.server.fastmcp import FastMCP
-
+from parseltongue import llm_doc
 from parseltongue.core import System, load_source
 
 # Initialize FastMCP server
@@ -49,7 +50,13 @@ def parseltongue_create_session(session_id: str) -> str:
         JSON with session creation status
     """
     if session_id in _sessions:
-        return json.dumps({"status": "exists", "session_id": session_id, "message": "Session already exists"})
+        return json.dumps(
+            {
+                "status": "exists",
+                "session_id": session_id,
+                "message": "Session already exists",
+            }
+        )
 
     _sessions[session_id] = System(overridable=True)
     return json.dumps({"status": "created", "session_id": session_id})
@@ -71,12 +78,14 @@ def parseltongue_register_document(session_id: str, name: str, content: str) -> 
     """
     system = get_session(session_id)
     system.register_document(name, content)
-    return json.dumps({
-        "status": "registered",
-        "document": name,
-        "chars": len(content),
-        "lines": content.count("\n") + 1,
-    })
+    return json.dumps(
+        {
+            "status": "registered",
+            "document": name,
+            "chars": len(content),
+            "lines": content.count("\n") + 1,
+        }
+    )
 
 
 @mcp.tool()
@@ -113,21 +122,25 @@ def parseltongue_load_dsl(session_id: str, dsl_source: str) -> str:
             if origin.verified:
                 verified.append(name)
             else:
-                unverified.append({
-                    "symbol": name,
-                    "reason": "quote_mismatch",
-                    "quotes": getattr(origin, "quotes", []),
-                })
+                unverified.append(
+                    {
+                        "symbol": name,
+                        "reason": "quote_mismatch",
+                        "quotes": getattr(origin, "quotes", []),
+                    }
+                )
 
-    return json.dumps({
-        "status": "loaded",
-        "facts_count": len(facts),
-        "theorems_count": len(theorems),
-        "verified_count": len(verified),
-        "unverified_count": len(unverified),
-        "unverified": unverified[:10],
-        "has_more_unverified": len(unverified) > 10,
-    })
+    return json.dumps(
+        {
+            "status": "loaded",
+            "facts_count": len(facts),
+            "theorems_count": len(theorems),
+            "verified_count": len(verified),
+            "unverified_count": len(unverified),
+            "unverified": unverified[:10],
+            "has_more_unverified": len(unverified) > 10,
+        }
+    )
 
 
 @mcp.tool()
@@ -153,13 +166,15 @@ def parseltongue_check_consistency(session_id: str) -> str:
     if isinstance(report, dict):
         return json.dumps({"status": "checked", **report})
 
-    return json.dumps({
-        "status": "checked",
-        "consistent": getattr(report, "consistent", True),
-        "issues": getattr(report, "issues", []),
-        "unverified": getattr(report, "unverified", []),
-        "summary": str(report),
-    })
+    return json.dumps(
+        {
+            "status": "checked",
+            "consistent": getattr(report, "consistent", True),
+            "issues": getattr(report, "issues", []),
+            "unverified": getattr(report, "unverified", []),
+            "summary": str(report),
+        }
+    )
 
 
 @mcp.tool()
@@ -184,15 +199,17 @@ def parseltongue_get_state(session_id: str) -> str:
     theorem_names = list(theorems.keys())
     doc_names = list(documents.keys()) if isinstance(documents, dict) else []
 
-    return json.dumps({
-        "session_id": session_id,
-        "documents": doc_names,
-        "facts_count": len(facts),
-        "theorems_count": len(theorems),
-        "facts": fact_names[:20],
-        "theorems": theorem_names[:20],
-        "has_more": len(facts) > 20 or len(theorems) > 20,
-    })
+    return json.dumps(
+        {
+            "session_id": session_id,
+            "documents": doc_names,
+            "facts_count": len(facts),
+            "theorems_count": len(theorems),
+            "facts": fact_names[:20],
+            "theorems": theorem_names[:20],
+            "has_more": len(facts) > 20 or len(theorems) > 20,
+        }
+    )
 
 
 @mcp.tool()
@@ -224,11 +241,13 @@ def parseltongue_list_sessions() -> str:
     """
     sessions = []
     for sid, system in _sessions.items():
-        sessions.append({
-            "session_id": sid,
-            "facts_count": len(system.facts),
-            "theorems_count": len(system.theorems),
-        })
+        sessions.append(
+            {
+                "session_id": sid,
+                "facts_count": len(system.facts),
+                "theorems_count": len(system.theorems),
+            }
+        )
     return json.dumps({"sessions": sessions, "count": len(sessions)})
 
 
@@ -256,7 +275,6 @@ def parseltongue_dsl_reference() -> str:
     Returns:
         Full DSL reference as a string
     """
-    from parseltongue import llm_doc
     return llm_doc()
 
 
@@ -267,7 +285,6 @@ def parseltongue_dsl_reference() -> str:
 
 def main():
     """CLI entry point - run the MCP server."""
-    import logging
     # Suppress all logging to avoid polluting the JSON-RPC stream
     logging.disable(logging.CRITICAL)
     mcp.run(transport="stdio")

@@ -15,8 +15,16 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8.0",
+    # Type checking
+    "ty>=0.0.1a6",
+    # Linting and formatting
     "ruff>=0.4",
+    # Testing with coverage
+    "pytest>=8.0",
+    "pytest-cov>=4.0",
+    "pytest-asyncio>=0.23",
+    # Commits
+    "commitizen>=3.0",
 ]
 
 [build-system]
@@ -26,12 +34,85 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/parseltongue_claude"]
 
+[project.scripts]
+parseltongue-mcp = "parseltongue_claude.server:main"
+
+# =============================================================================
+# Ruff - Linting and Formatting
+# =============================================================================
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+src = ["src", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "SIM"]
+select = [
+    "E",      # pycodestyle errors
+    "F",      # pyflakes
+    "I",      # isort
+    "UP",     # pyupgrade
+    "B",      # flake8-bugbear
+    "SIM",    # flake8-simplify
+    "RUF",    # ruff-specific rules
+    "C4",     # flake8-comprehensions
+    "PTH",    # flake8-use-pathlib
+    "PL",     # pylint
+]
+ignore = [
+    "PLR0913",  # Too many arguments
+    "PLR2004",  # Magic value comparison
+]
 
-[project.scripts]
-parseltongue-mcp = "parseltongue_claude.server:main"
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+
+# =============================================================================
+# Ty - Type Checking
+# =============================================================================
+
+[tool.ty]
+src = ["src"]
+
+# =============================================================================
+# Pytest - Testing
+# =============================================================================
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = [
+    "-v",
+    "--cov=parseltongue_claude",
+    "--cov-report=term-missing",
+    "--cov-report=html:coverage",
+    "--cov-fail-under=80",
+]
+
+[tool.coverage.run]
+source = ["src/parseltongue_claude"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+]
+
+# =============================================================================
+# Commitizen - Conventional Commits
+# =============================================================================
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+version_files = [
+    "pyproject.toml:^version",
+    "src/parseltongue_claude/__init__.py:^__version__",
+]
+tag_format = "v$version"
+update_changelog_on_bump = true
