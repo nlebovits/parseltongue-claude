@@ -48,6 +48,18 @@ claude mcp add --transport stdio parseltongue -- /path/to/parseltongue-claude/ru
 
 Then restart Claude Code.
 
+### Skill Installation (Optional)
+
+The repo includes a Claude Code skill for guided document analysis:
+
+```bash
+# Symlink the skill to your skills directory
+mkdir -p ~/.claude/skills
+ln -s /path/to/parseltongue-claude/skills/parseltongue ~/.claude/skills/parseltongue
+```
+
+Then use `/parseltongue [document] [question]` in Claude Code.
+
 ## Usage
 
 In Claude Code:
