@@ -25,17 +25,25 @@ pip install -e .
 
 ## Claude Code Setup
 
-Add to `~/.claude/settings.json`:
+Add to `~/.claude.json` under `mcpServers` (user scope):
 
 ```json
 {
   "mcpServers": {
     "parseltongue": {
-      "command": "uv",
-      "args": ["run", "--directory", "/home/nissim/Documents/dev/parseltongue-claude", "parseltongue-mcp"]
+      "type": "stdio",
+      "command": "/path/to/parseltongue-claude/run-server.sh",
+      "args": [],
+      "env": {}
     }
   }
 }
+```
+
+Or use the CLI:
+
+```bash
+claude mcp add --transport stdio parseltongue -- /path/to/parseltongue-claude/run-server.sh
 ```
 
 Then restart Claude Code.
@@ -107,4 +115,4 @@ ruff check src/
 
 ## License
 
-MIT
+Apache-2.0

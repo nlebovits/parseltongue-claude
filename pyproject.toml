@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "MCP server wrapping Parseltongue's symbolic verification engine for Claude Code"
 readme = "README.md"
 requires-python = ">=3.11"
-license = "MIT"
+license = "Apache-2.0"
 authors = [{ name = "Nissim Lebovits" }]
 keywords = ["mcp", "parseltongue", "verification", "claude", "llm"]
 
