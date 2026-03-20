@@ -1,22 +1,23 @@
 ---
 name: parseltongue-review
-description: Adversarial documentation audit using Parseltongue. Use when reviewing your own docs (README, mkdocs, API docs) for accuracy, duplication with upstream, and internal consistency. Invoke with "/parseltongue-review [file or topic]".
+description: Documentation audit using Parseltongue. Verify docs for accuracy, find duplicated content, check consistency with source. Invoke with "/parseltongue-review [file or directory]".
 ---
 
-# Adversarial Doc Review
+# Documentation Audit
 
-Audit your documentation for accuracy using Parseltongue verification.
+Verify documentation accuracy using Parseltongue.
 
 ## When to Use
 
-- Reviewing README before release
-- Auditing mkdocs site for accuracy
-- Checking if docs duplicate upstream content
-- Verifying API docs match implementation
+- Audit README for accuracy
+- Review mkdocs site against source
+- Find duplicated content that should link upstream
+- Verify API docs match implementation
+- Check consistency across doc pages
 
 ## Instructions
 
-### 1. Load Your Doc + Source of Truth
+### 1. Load Docs + Source of Truth
 
 ```
 mcp__parseltongue__parseltongue_create_session
@@ -24,8 +25,8 @@ mcp__parseltongue__parseltongue_create_session
 
 mcp__parseltongue__parseltongue_register_document
   session_id: "doc-review-..."
-  name: "my-doc"
-  content: [your README/docs]
+  name: "docs"
+  content: [documentation to audit]
 
 mcp__parseltongue__parseltongue_register_document
   session_id: "doc-review-..."
@@ -33,13 +34,13 @@ mcp__parseltongue__parseltongue_register_document
   content: [upstream docs, source code, or authoritative source]
 ```
 
-### 2. Extract Claims from Your Doc
+### 2. Extract Claims
 
-For each claim in your documentation, create a fact:
+For each claim in the documentation, create a fact:
 
 ```scheme
 (fact claim-api-returns-json true
-    :evidence (evidence "my-doc"
+    :evidence (evidence "docs"
         :quotes ("Returns JSON response")
         :explanation "API behavior claim"))
 ```
@@ -61,7 +62,7 @@ If content appears in both docs verbatim, flag it:
 
 ```scheme
 (fact duplicated-content true
-    :evidence (evidence "my-doc"
+    :evidence (evidence "docs"
         :quotes ("Install with pip install foo")
         :explanation "This exact text appears in upstream"))
 ```
@@ -74,34 +75,36 @@ mcp__parseltongue__parseltongue_check_consistency
 ```
 
 Report:
-- **Unverified claims** - Docs say something source doesn't support
-- **Duplicated content** - Should link to upstream instead
-- **Inconsistencies** - Conflicts between your docs and source
+- **Unverified claims** — Docs say something source doesn't support
+- **Duplicated content** — Should link to upstream instead
+- **Inconsistencies** — Conflicts between docs and source
 
 ## Example
 
 ```
-User: /parseltongue-review README.md
+User: /parseltongue-review docs/
 
-Claude: Loading README and fetching upstream docs...
-        [registers both documents]
+Claude: Loading docs and source files...
+        [registers docs + source code/upstream]
 
-        Extracting claims from README...
-        - "DSL syntax: fact, derive, diff" [ref:dsl-claim]
-        - "80% test coverage required" [ref:coverage-claim]
+        Extracting claims...
+        - "API returns JSON" [ref:api-claim]
+        - "Requires Python 3.11+" [ref:python-claim]
+        - "Install with pip install foo" [ref:install-claim]
 
-        Cross-checking against upstream...
-        ✗ DSL syntax duplicates upstream README
-        ✓ Coverage requirement verified in pyproject.toml
+        Cross-checking...
+        ✓ API returns JSON - verified in source
+        ✓ Python 3.11+ - matches pyproject.toml
+        ✗ Install instructions duplicate upstream
 
         ## Findings
 
-        **Remove (duplicates upstream):**
-        - DSL Quick Reference section [ref:dsl-claim]
+        **Duplicated (link instead):**
+        - Installation section [ref:install-claim]
 
-        **Keep (unique to this project):**
-        - Coverage requirement [ref:coverage-claim]
-        - Skill installation instructions
+        **Verified:**
+        - API behavior [ref:api-claim]
+        - Python version [ref:python-claim]
 ```
 
 ## Checklist

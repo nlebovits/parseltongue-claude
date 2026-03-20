@@ -42,12 +42,13 @@ Analyze external documents with provable claims. Every fact traces to a verbatim
 /parseltongue [SEC filing] Are there revenue recognition red flags?
 ```
 
-**`/parseltongue-review`** — Adversarial doc audit
+**`/parseltongue-review`** — Documentation audit
 
-Review your own docs (README, mkdocs, API docs) for accuracy and duplication.
+Audit docs for accuracy, duplication, and consistency with source.
 
 ```
-/parseltongue-review README.md  # check against upstream, find duplicated content
+/parseltongue-review README.md      # vs upstream, find duplicated content
+/parseltongue-review docs/          # audit mkdocs site
 ```
 
 ## MCP Tools
