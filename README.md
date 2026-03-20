@@ -11,12 +11,14 @@ uv pip install -e .
 # 2. Add MCP server
 claude mcp add --transport stdio parseltongue -- $(pwd)/run-server.sh
 
-# 3. Install skill (recommended)
+# 3. Install skills
 mkdir -p ~/.claude/skills
 ln -s $(pwd)/skills/parseltongue ~/.claude/skills/parseltongue
+ln -s $(pwd)/skills/parseltongue-review ~/.claude/skills/parseltongue-review
 
 # 4. Restart Claude Code, then:
-/parseltongue [paste document] What are the key claims?
+/parseltongue [document] What are the key claims?
+/parseltongue-review README.md  # audit your own docs
 ```
 
 ## What It Does
@@ -30,17 +32,23 @@ This:         You → Claude Code → Parseltongue MCP → Verify
 
 Every claim must cite a verbatim quote. Misquotes are flagged as hallucinations.
 
-## The Skill
+## Skills
 
-The `/parseltongue` skill guides Claude through a 5-step grounded analysis:
+**`/parseltongue`** — Grounded document analysis
 
-1. **Register** — Load document into session
-2. **Extract** — Generate facts with verbatim `:evidence` quotes
-3. **Derive** — Draw conclusions using formal logic
-4. **Verify** — Check all quotes match source (catches hallucinations)
-5. **Answer** — Respond with `[ref:symbol]` citations
+Analyze external documents with provable claims. Every fact traces to a verbatim quote.
 
-Use cases: SEC filings, research papers, legal docs, technical specs.
+```
+/parseltongue [SEC filing] Are there revenue recognition red flags?
+```
+
+**`/parseltongue-review`** — Adversarial doc audit
+
+Review your own docs (README, mkdocs, API docs) for accuracy and duplication.
+
+```
+/parseltongue-review README.md  # check against upstream, find duplicated content
+```
 
 ## MCP Tools
 
