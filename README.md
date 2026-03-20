@@ -115,50 +115,12 @@ See `parseltongue_dsl_reference` tool for full documentation.
 ## Development
 
 ```bash
-# Install dev dependencies
-uv pip install -e ".[dev]"
-
-# Setup pre-commit hooks
-pre-commit install --hook-type commit-msg --hook-type pre-commit
-```
-
-### Testing
-
-```bash
-# Run tests with coverage
-pytest
-
-# Run specific test
-pytest tests/test_server.py::TestLoadDsl -v
-```
-
-### Linting & Formatting
-
-```bash
-# Lint and auto-fix
-ruff check --fix src/ tests/
-
-# Format
-ruff format src/ tests/
-```
-
-### Type Checking
-
-```bash
-# Check types
-ty check src/
-```
-
-### Commits
-
-Uses [Commitizen](https://commitizen-tools.github.io/commitizen/) for conventional commits:
-
-```bash
-# Interactive commit
-cz commit
-
-# Or use git commit with conventional format
-git commit -m "feat: add new tool"
+uv pip install -e ".[dev]"                # install
+pre-commit install --hook-type commit-msg --hook-type pre-commit  # hooks
+pytest                                     # test (80% coverage required)
+ruff check --fix . && ruff format .        # lint + format
+ty check src/                              # type check
+cz commit                                  # conventional commit
 ```
 
 ## License
